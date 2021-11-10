@@ -19,7 +19,7 @@ import android.widget.Toast;
 public class MainActivity extends AppCompatActivity {
     private static final String ID_CANAL = "El nombre de mi canal";
     private static final int CODIGO_RESPUESTA = 1;
-    Button buttonNotificacion, buttonNotificacion2;
+    Button buttonNotificacion, buttonNotificacion2, buttonNotificacion3;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -33,6 +33,14 @@ public class MainActivity extends AppCompatActivity {
 
         buttonNotificacion = findViewById(R.id.buttonNotificacion);
         buttonNotificacion2 = findViewById(R.id.buttonNotificacion2);
+        buttonNotificacion3 = findViewById(R.id.button3);
+
+        buttonNotificacion3.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                lanzarNotificacionMuchoTexto();
+            }
+        });
 
         buttonNotificacion.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -47,6 +55,47 @@ public class MainActivity extends AppCompatActivity {
                 lanzarNotificacionTextoLargo();
             }
         });
+    }
+
+    private void lanzarNotificacionMuchoTexto() {
+        String idChannel = "Canal 3";
+        String nombreCanal = "Mi canal muchas líneas";
+        NotificationManager notificationManager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
+        NotificationCompat.Builder builder = new NotificationCompat.Builder(this, ID_CANAL);
+
+        builder.setSmallIcon(R.drawable.ic_launcher_background)
+                .setContentTitle("Ejemplo de notificación con texto largo")
+                .setAutoCancel(false).setContentText("Aquí va el texto de mi notificación")
+                .setContentText("Primero poquito texto");
+
+       NotificationCompat.InboxStyle inboxStyle = new NotificationCompat.InboxStyle();
+       inboxStyle.setBigContentTitle("Este es una notificación con muchos datos");
+       inboxStyle.addLine("Esta es la primera línea de muchas más");
+       inboxStyle.addLine("Aquí va otra línea va bien");
+       inboxStyle.addLine("Cristian ponte bueno ya");
+       inboxStyle.addLine("Mario hay que andar un poquito más");
+       inboxStyle.addLine("El profesor se aburre");
+
+
+        builder.setStyle(inboxStyle);
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            NotificationChannel notificationChannel = new NotificationChannel(idChannel, nombreCanal, NotificationManager.IMPORTANCE_DEFAULT);
+
+            notificationChannel.enableLights(true);
+            notificationChannel.setLightColor(Color.GREEN);
+            notificationChannel.enableVibration(true);
+            notificationChannel.setShowBadge(true);
+            builder.setChannelId(idChannel);
+            notificationManager.createNotificationChannel(notificationChannel);
+
+        } else {
+            //Menor que oreo
+            builder.setDefaults(Notification.DEFAULT_SOUND | Notification.DEFAULT_VIBRATE | Notification.DEFAULT_LIGHTS);
+        }
+
+        notificationManager.notify(3, builder.build());
+
     }
 
     private void lanzarNotificacionTextoLargo() {
