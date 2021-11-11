@@ -9,6 +9,8 @@ import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.TaskStackBuilder;
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.os.Build;
 import android.os.Bundle;
@@ -19,7 +21,7 @@ import android.widget.Toast;
 public class MainActivity extends AppCompatActivity {
     private static final String ID_CANAL = "El nombre de mi canal";
     private static final int CODIGO_RESPUESTA = 1;
-    Button buttonNotificacion, buttonNotificacion2, buttonNotificacion3;
+    Button buttonNotificacion, buttonNotificacion2, buttonNotificacion3, buttonNotificacion4;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -34,6 +36,14 @@ public class MainActivity extends AppCompatActivity {
         buttonNotificacion = findViewById(R.id.buttonNotificacion);
         buttonNotificacion2 = findViewById(R.id.buttonNotificacion2);
         buttonNotificacion3 = findViewById(R.id.button3);
+        buttonNotificacion4 = findViewById(R.id.button4);
+
+        buttonNotificacion4.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                lanzarNotificacionConFoto();
+            }
+        });
 
         buttonNotificacion3.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -55,6 +65,43 @@ public class MainActivity extends AppCompatActivity {
                 lanzarNotificacionTextoLargo();
             }
         });
+    }
+
+    private void lanzarNotificacionConFoto() {
+        String idChannel = "Canal 4";
+        String nombreCanal = "Mi canal con fotos";
+        NotificationManager notificationManager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
+        NotificationCompat.Builder builder = new NotificationCompat.Builder(this, ID_CANAL);
+
+        builder.setSmallIcon(R.drawable.ic_launcher_background)
+                .setContentTitle("Ejemplo de notificación con texto largo")
+                .setAutoCancel(false).setContentText("Aquí va el texto de mi notificación")
+                .setContentText("Primero poquito texto");
+
+        NotificationCompat.BigPictureStyle bigPictureStyle = new NotificationCompat.BigPictureStyle();
+        Bitmap bitmap = BitmapFactory.decodeResource(getResources(),R.drawable.ben);
+        bigPictureStyle.bigPicture(bitmap);
+        bigPictureStyle.setBigContentTitle("Título para imagen grande");
+        bigPictureStyle.setSummaryText("Aquí mi resumen");
+
+        builder.setStyle(bigPictureStyle);
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            NotificationChannel notificationChannel = new NotificationChannel(idChannel, nombreCanal, NotificationManager.IMPORTANCE_DEFAULT);
+
+            notificationChannel.enableLights(true);
+            notificationChannel.setLightColor(Color.GREEN);
+            notificationChannel.enableVibration(true);
+            notificationChannel.setShowBadge(true);
+            builder.setChannelId(idChannel);
+            notificationManager.createNotificationChannel(notificationChannel);
+
+        } else {
+            //Menor que oreo
+            builder.setDefaults(Notification.DEFAULT_SOUND | Notification.DEFAULT_VIBRATE | Notification.DEFAULT_LIGHTS);
+        }
+
+        notificationManager.notify(4, builder.build());
     }
 
     private void lanzarNotificacionMuchoTexto() {
